@@ -3,3 +3,5 @@ pvorca
 groq
 pygame
 SpeechRecognition
+leetscrape
+beautifulsoup4

@@ -118,7 +118,6 @@ class API:
                 [prompts[3], prompts[4], code1, prompts[6], code2, prompts[7], leetcode]
             ),
             temperature=0.0,
-            max_tokens=1,
         )
         return response
 

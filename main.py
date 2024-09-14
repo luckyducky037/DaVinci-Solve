@@ -13,11 +13,11 @@ question = fetch.get_question(question_title)
 question_body = question[1]
 question_code_stub = question[2]
 
-while True:
-    print(question[0])
-    print("-" * 64)
-    print(question_body)
+print(question[0])
+print("-" * 64)
+print(question_body)
 
+while True:
     print("OK, get ready to describe your approach to the question.")
 
     transcript = api.listen()

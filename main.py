@@ -4,8 +4,6 @@ from fetch import Fetch
 api = API()
 fetch = Fetch()
 
-# Console-based main loop
-
 question_title = input("What question would you like to work on? ")
 question_title = question_title.replace(" ", "-").lower()
 question = fetch.get_question(question_title)

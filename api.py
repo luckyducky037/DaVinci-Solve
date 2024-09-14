@@ -96,7 +96,14 @@ class API:
             + boilerplate
             + "\n\nPlease follow only my thinking and convert it to code. Please send me just the code and nothing else."
         )
-        response = response.strip().strip("```py").strip("```cpp").strip("```").strip()
+        response = (
+            response.strip()
+            .strip("```python")
+            .strip("```py")
+            .strip("```cpp")
+            .strip("```")
+            .strip()
+        )
         return response
 
     def evaluate_thinking(self, text: str) -> str:
@@ -110,13 +117,15 @@ class API:
 
     def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            'The first code snippet is the solution, the second code snippe is the user\' solution. Compare the following two code snippets and tell me "yes" if they are the same solution and "no" if different:\n\n```\n'
+            'The first code snippet is the solution, the second code snippet is the user\' solution. Compare the following two code snippets and tell me "yes" if they are the same solution and "no" if different:\n\n```\n'
             + code1
             + "\n```\n\n```\n"
-            + code2,
-            +"\n```\n\n",
-            +"Here is the LeetCode problem which the code is solving:\n\n",
-            +"```\n" + leetcode + "\n```",
+            + code2
+            + "\n```\n\n"
+            + "Here is the LeetCode problem which the code is solving:\n\n"
+            + "```\n"
+            + leetcode
+            + "\n```",
             temperature=0.0,
             max_tokens=1,
         )

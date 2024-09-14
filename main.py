@@ -13,7 +13,6 @@ question = fetch.get_question(question_title)
 question_body = question[1]
 question_code_stub = question[2]
 
-# Explanation phase
 while True:
     print(question[0])
     print("-" * 64)
@@ -36,4 +35,4 @@ while True:
     else:
         print(api.evaluate_thinking(solution, codegen, question_body))
 
-# Implementation phase
+api.open_problem(question_title)

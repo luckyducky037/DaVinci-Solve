@@ -40,7 +40,7 @@ def listen(filename):
 
 
 def groq_listen(filename, prompt=""):
-    with open(filename, "rb") as file:
+    with open(filename + ".wav", "rb") as file:
         transcription = groq_client.audio.transcriptions.create(
             file=(filename, file.read()),
             model="distil-whisper-large-v3-en",

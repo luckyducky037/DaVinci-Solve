@@ -1,3 +1,5 @@
 python-dotenv
 pvorca
 groq
+pygame
+SpeechRecognition

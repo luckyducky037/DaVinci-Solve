@@ -110,7 +110,7 @@ class API:
 
     def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            'The first code snippet is the solution, the second code snippetCompare the following two code snippets and tell me "yes" if they are the same solution and "no" if different:\n\n```\n'
+            'The first code snippet is the solution, the second code snippe is the user\' solution. Compare the following two code snippets and tell me "yes" if they are the same solution and "no" if different:\n\n```\n'
             + code1
             + "\n```\n\n```\n"
             + code2,

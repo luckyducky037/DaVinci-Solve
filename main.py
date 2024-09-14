@@ -68,7 +68,7 @@ def groq_response(prompt):
 
 
 def orca_speak(text: str):
-    orca_client.synthesize_to_file(text=text, path="orca_output.wav")
+    orca_client.synthesize_to_file(text=text, output_path="orca_output.wav")
     pygame.mixer.music.load("orca_output.wav")
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():

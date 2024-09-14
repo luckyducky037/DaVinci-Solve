@@ -78,6 +78,8 @@ def orca_speak(text: str):
     while pygame.mixer.music.get_busy():
         pass
 
+with open("prompts.txt", "r") as f:
+    prompts = f.read().splitlines()
 
 class API:
     def __init__(self): ...
@@ -88,14 +90,7 @@ class API:
 
     def thinking_to_code(self, leetcode: str, text: str, boilerplate: str) -> str:
         response = groq_response(
-            # "I am solving the following LeetCode problem:\n\n"
-            # + leetcode
-            ""
-            + "\n\nHere is my step-by-step thinking for solving a problem:\n\n"
-            + text
-            + "\n\nHere is the boilerplate code for the problem:\n\n"
-            + boilerplate
-            + "\n\nPlease follow only my thinking and convert it to code. Only follow my thinking. Please send me just the code and nothing else."
+            "\n".join([prompts[0], text, prompts[1], boilerplate, prompts[2]])
         )
         response = (
             response.strip()
@@ -118,15 +113,7 @@ class API:
 
     def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            'The first code snippet is the solution, the second code snippet is the user\' solution. Compare the following two code snippets and tell me "yes" if they are the same solution and "no" if different:\n\n```\n'
-            + code1
-            + "\n```\n\n```\n"
-            + code2
-            + "\n```\n\n"
-            + "Here is the LeetCode problem which the code is solving:\n\n"
-            + "```\n"
-            + leetcode
-            + "\n```",
+            "\n".join([prompts[2], code1, prompts[3], code2, prompts[4], leetcode]),
             temperature=0.0,
             max_tokens=1,
         )

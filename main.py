@@ -30,9 +30,13 @@ while True:
     print(compare_result)
 
     if compare_result == "Yes":
-        print("OK, that approach sounds good. Now, get ready to code it out.")
+        feedback = "OK, that approach sounds good. Now, get ready to code it out."
+        print(feedback)
+        api.speak(feedback)
         break
     else:
-        print(api.evaluate_thinking(solution, codegen, question_body))
+        feedback = api.evaluate_thinking(solution, codegen, question_body)
+        print(feedback)
+        api.speak(feedback)
 
 api.open_problem(question_title)

@@ -1,13 +1,17 @@
-import speech_recognition as sr
-import pvorca
-from groq import Groq
-from dotenv import load_dotenv
 from os import getenv
 
+import pvorca
+import pygame
+import speech_recognition as sr
+from dotenv import load_dotenv
+from groq import Groq
+
+pygame.mixer.init()
 load_dotenv()
 
 groq_client = Groq(api_key=getenv("GROQ"))
 orca_client = pvorca.create(access_key=getenv("ORCA"))
+
 
 def record_until_silence():
     r = sr.Recognizer()
@@ -19,6 +23,7 @@ def record_until_silence():
         audio = r.listen(source, phrase_time_limit=None, timeout=None)
 
     return audio
+
 
 def listen(filename):
     audio = record_until_silence()
@@ -33,8 +38,19 @@ def listen(filename):
 
     return filename
 
-def groq_listen():
-    pass
+
+def groq_listen(filename, prompt=""):
+    with open(filename, "rb") as file:
+        transcription = groq_client.audio.transcriptions.create(
+            file=(filename, file.read()),
+            model="distil-whisper-large-v3-en",
+            prompt=prompt,
+            response_format="text",
+            language="en",
+            temperature=0.0,
+        )
+    return transcription.text
+
 
 def groq_response(prompt):
     chat_completion = groq_client.chat.completions.create(
@@ -44,10 +60,25 @@ def groq_response(prompt):
                 "content": prompt,
             }
         ],
-        model="llama3-8b-8192",
+        model="llama3-3.1-70b-versatile",
     )
 
-    print(chat_completion.choices[0].message.content)
+    return chat_completion.choices[0].message.content
 
-def orca_speak(text):
-    pass
+
+def orca_speak(text: str):
+    orca_client.synthesize_to_file(text=text, path="orca_output.wav")
+    pygame.mixer.music.load("orca_output.wav")
+    pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy():
+        pass
+
+
+transcript = groq_listen(listen("input"))
+print(transcript)
+response = groq_response(
+    "Evaluate this explanation from 1-10, with no other output other than the number 1 to 10: "
+    + transcript
+)
+print(response)
+orca_speak(response)

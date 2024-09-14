@@ -37,5 +37,3 @@ while True:
         print(api.evaluate_thinking(solution, codegen, question_body))
 
 # Implementation phase
-while True:
-    pass

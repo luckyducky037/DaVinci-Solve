@@ -1,3 +1,4 @@
+import webbrowser
 from os import getenv
 
 import pvorca
@@ -54,7 +55,10 @@ def groq_listen(filename, prompt="") -> str:
 
 
 def groq_response(
-    prompt, temperature: float = 1.0, max_tokens: int | None = None
+    prompt,
+    temperature: float = 1.0,
+    max_tokens: int | None = None,
+    model: str = "llama-3.1-70b-versatile",
 ) -> str:
     chat_completion = groq_client.chat.completions.create(
         messages=[
@@ -63,7 +67,7 @@ def groq_response(
                 "content": prompt,
             }
         ],
-        model="llama-3.1-70b-versatile",
+        model=model,
         temperature=temperature,
         max_tokens=max_tokens,
     )
@@ -78,15 +82,21 @@ def orca_speak(text: str):
     while pygame.mixer.music.get_busy():
         pass
 
+
 with open("prompts.txt", "r") as f:
     prompts = f.read().splitlines()
+
 
 class API:
     def __init__(self): ...
 
     def listen(self) -> str:
         listen("input")
-        return groq_listen("input")
+        transcription = groq_listen("input")
+        refined = groq_response(
+            f"This is the transcription of a voice recording:\n\n{transcription}\n\nPlease refine the words appropriately and return that only. For context, the voice recording was about describing an approach to a coding problem."
+        )
+        return refined
 
     def thinking_to_code(self, text: str, boilerplate: str) -> str:
         response = groq_response(
@@ -103,7 +113,10 @@ class API:
         return response
 
     def evaluate_thinking(self, code1: str, code2: str, leetcode: str) -> str:
-        response = groq_response("\n".join([prompts[3], prompts[4], code1, prompts[6], code2, prompts[7], leetcode]),
+        response = groq_response(
+            "\n".join(
+                [prompts[3], prompts[4], code1, prompts[6], code2, prompts[7], leetcode]
+            ),
             temperature=0.0,
             max_tokens=1,
         )
@@ -111,7 +124,9 @@ class API:
 
     def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            "\n".join([prompts[3], prompts[5], code1, prompts[6], code2, prompts[7], leetcode]),
+            "\n".join(
+                [prompts[3], prompts[5], code1, prompts[6], code2, prompts[7], leetcode]
+            ),
             temperature=0.0,
             max_tokens=1,
         )
@@ -120,5 +135,10 @@ class API:
     def speak(self, text: str) -> None:
         orca_speak(text)
 
+    def open_problem(self, title: str):
+        title = title.replace(" ", "-").lower()
+        webbrowser.open(f"http://leetcode.com/problems/{title}/description/")
 
+
+api = API()
 api = API()

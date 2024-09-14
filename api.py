@@ -7,6 +7,8 @@ import speech_recognition as sr
 from dotenv import load_dotenv
 from groq import Groq
 
+from prompts import prompts
+
 pygame.mixer.init()
 load_dotenv()
 
@@ -59,6 +61,7 @@ def groq_response(
     temperature: float = 1.0,
     max_tokens: int | None = None,
     model: str = "llama-3.1-70b-versatile",
+    stop: list[str] = None,
 ) -> str:
     chat_completion = groq_client.chat.completions.create(
         messages=[
@@ -70,6 +73,7 @@ def groq_response(
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
+        stop=stop,
     )
 
     return chat_completion.choices[0].message.content
@@ -83,8 +87,12 @@ def orca_speak(text: str):
         pass
 
 
-with open("prompts.txt", "r") as f:
-    prompts = f.read().splitlines()
+"""
+[0]: turn explanation into code
+[1]: compare code
+[2]: give feedback on code
+[3]: refined transcript
+"""
 
 
 class API:
@@ -94,14 +102,12 @@ class API:
         listen("input")
         transcription = groq_listen("input")
         refined = groq_response(
-            f"This is the transcription of a voice recording:\n\n{transcription}\n\nPlease refine the words appropriately and return that only. For context, the voice recording was about describing an approach to a coding problem."
+            prompts[3].format(transcription=transcription), stop=["\n"]
         )
         return refined
 
     def thinking_to_code(self, text: str, boilerplate: str) -> str:
-        response = groq_response(
-            "\n".join([prompts[0], text, prompts[1], boilerplate, prompts[2]])
-        )
+        response = groq_response(prompts[0].format(explanation=text, stub=boilerplate))
         response = (
             response.strip()
             .strip("```python")
@@ -114,18 +120,14 @@ class API:
 
     def evaluate_thinking(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            "\n".join(
-                [prompts[3], prompts[4], code1, prompts[6], code2, prompts[7], leetcode]
-            ),
+            prompts[2].format(code1=code1, code2=code2, problem=leetcode),
             temperature=0.0,
         )
         return response
 
     def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            "\n".join(
-                [prompts[3], prompts[5], code1, prompts[6], code2, prompts[7], leetcode]
-            ),
+            prompts[1].format(code1=code1, code2=code2, problem=leetcode),
             temperature=0.0,
             max_tokens=1,
         )
@@ -139,5 +141,4 @@ class API:
         webbrowser.open(f"http://leetcode.com/problems/{title}/description/")
 
 
-api = API()
 api = API()

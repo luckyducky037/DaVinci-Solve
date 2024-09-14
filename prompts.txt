@@ -1,8 +1,3 @@
-Here is my step-by-step thinking for solving a problem:
-Here is the boilerplate code for the problem:
-Please follow only my thinking and convert it to code. Only follow my thinking. Please write just the code and nothing else.
-The first code snippet is the solution, the second code snippet is the user\'s solution.
-There is something missing from the second code snippet, either logically in that it fails to produce the same output, or that it is too slow with a large time complexity that can be optimized. Give a hint on what is missing to the user so that they can reiterate.
-Compare the following two code snippets and write "Yes" if they cover the same edge cases, are both algorithmically correct, and that the second code snippet is at least as fast as the first code snippet. Write "No" if not.
---------------------------------------------------
-Here is the LeetCode problem which both snippets of code are solving:
+Here is my step-by-step thinking for solving a problem:\n{explanation}\nHere is the boilerplate code for the problem:\n{stub}\nPlease follow only my thinking and convert it to code. Only follow my thinking. Please write just the code and nothing else.
+The first code snippet is the solution, the second code snippet is the user's solution.\n{code1}\n--------------------------------------------------\n{code2}\nCompare the following two code snippets and write "Yes" if they cover the same edge cases, are both algorithmically correct, and that the second code snippet is at least as fast as the first code snippet. Write "No" if not.\nHere is the LeetCode problem which both snippets of code are solving:\n{problem}
+The first code snippet is the solution, the second code snippet is the user\'s solution.\n{code1}\n--------------------------------------------------\n{code2}\nThere is something missing from the second code snippet, either logically in that it fails to produce the same output, or that it is too slow with a large time complexity that can be optimized. Give a two-sentence hint on what is missing to the user so that they can reiterate. DO NOT write any Python code for the user, but give a verbal hint to lead the user in the right direction.\nHere is the LeetCode problem which both snippets of code are solving:\n{problem}

@@ -88,13 +88,14 @@ class API:
 
     def thinking_to_code(self, leetcode: str, text: str, boilerplate: str) -> str:
         response = groq_response(
-            "I am solving the following LeetCode problem:\n\n"
-            + leetcode
-            + "\n\nHere is my step-by-step thinking for solving the problem:\n\n"
+            # "I am solving the following LeetCode problem:\n\n"
+            # + leetcode
+            ""
+            + "\n\nHere is my step-by-step thinking for solving a problem:\n\n"
             + text
             + "\n\nHere is the boilerplate code for the problem:\n\n"
             + boilerplate
-            + "\n\nPlease follow only my thinking and convert it to code. Please send me just the code and nothing else."
+            + "\n\nPlease follow only my thinking and convert it to code. Only follow my thinking. Please send me just the code and nothing else."
         )
         response = (
             response.strip()

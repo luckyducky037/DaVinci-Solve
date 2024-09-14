@@ -23,7 +23,7 @@ def record_until_silence():
         r.adjust_for_ambient_noise(source, duration=1)
         print("Speak now. Recording will stop after silence is detected.")
 
-        audio = r.listen(source, phrase_time_limit=None, timeout=None)
+        audio = r.listen(source, phrase_time_limit=None, timeout=10)
 
     return audio
 

@@ -1,6 +1,6 @@
 Here is my step-by-step thinking for solving a problem:
 Here is the boilerplate code for the problem:
 Please follow only my thinking and convert it to code. Only follow my thinking. Please write just the code and nothing else.
-The first code snippet is the solution, the second code snippet is the user\'s solution. Compare the following two code snippets and write "Yes" if they are the same solution and "No" if different:
+The first code snippet is the solution, the second code snippet is the user\'s solution. Compare the following two code snippets and write "Yes" if they cover the same edge cases, are both algorithmically correct, and run at the same time complexity. Write "No" if not.
 --------------------------------------------------
 Here is the LeetCode problem which both snippets of code are solving:

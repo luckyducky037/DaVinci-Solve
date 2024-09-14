@@ -50,7 +50,7 @@ def groq_listen(filename, prompt=""):
             language="en",
             temperature=0.0,
         )
-    return transcription.text
+    return transcription
 
 
 def groq_response(prompt):

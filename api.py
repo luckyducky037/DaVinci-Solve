@@ -88,7 +88,7 @@ class API:
         listen("input")
         return groq_listen("input")
 
-    def thinking_to_code(self, leetcode: str, text: str, boilerplate: str) -> str:
+    def thinking_to_code(self, text: str, boilerplate: str) -> str:
         response = groq_response(
             "\n".join([prompts[0], text, prompts[1], boilerplate, prompts[2]])
         )
@@ -102,10 +102,8 @@ class API:
         )
         return response
 
-    def evaluate_thinking(self, text: str) -> str:
-        response = groq_response(
-            "Evaluate this explanation from 1-10, with no other output other than the number 1 to 10: "
-            + text,
+    def evaluate_thinking(self, code1: str, code2: str, leetcode: str) -> str:
+        response = groq_response("\n".join([prompts[3], prompts[4], code1, prompts[6], code2, prompts[7], leetcode]),
             temperature=0.0,
             max_tokens=1,
         )
@@ -113,7 +111,7 @@ class API:
 
     def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
         response = groq_response(
-            "\n".join([prompts[2], code1, prompts[3], code2, prompts[4], leetcode]),
+            "\n".join([prompts[3], prompts[5], code1, prompts[6], code2, prompts[7], leetcode]),
             temperature=0.0,
             max_tokens=1,
         )

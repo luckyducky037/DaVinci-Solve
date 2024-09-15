@@ -1,5 +1,5 @@
 import gradio as gr
-
+import os
 from api import API
 from fetch import Fetch
 
@@ -9,7 +9,7 @@ fetch = Fetch()
 question, title, question_body, question_code_stub = None, None, None, None
 
 
-def handle_first_submission(option, stage):
+def handle_first_submission(option):
     global question, title, question_body, question_code_stub
 
     question_title = option.replace(" ", "-").lower()
@@ -20,8 +20,7 @@ def handle_first_submission(option, stage):
     question_code_stub = question[2]
 
     transcript = f"{title}\n{question_body}"
-    stage = 1
-    return transcript, stage
+    return transcript
 
 
 def handle_second_submission(audio, option):
@@ -48,7 +47,7 @@ def handle_second_submission(audio, option):
 
     print(transcript)
 
-    return feedback, "openai_output.wav"
+    return feedback, os.path.abspath("openai_output.wav")
 
 
 def audioplay(audio): ...
@@ -65,8 +64,6 @@ with gr.Blocks() as demo:
 
     prob_text = gr.Textbox(label="Problem Statement")
 
-    stage = gr.State(value=0)
-
     submit_button_1 = gr.Button("Submit Problem")
 
     dynamic_audio = gr.Audio(
@@ -76,18 +73,11 @@ with gr.Blocks() as demo:
         visible=False,
     )
 
-    def display_audio(stage):
-        if stage == 1:
-            return (
-                gr.update(visible=True),
-                gr.update(visible=True),
-                gr.update(visible=True),
-                gr.update(visible=False, autoplay=False),
-            )
+    def display_audio():
         return (
-            gr.update(visible=False),
-            gr.update(visible=False),
-            gr.update(visible=False),
+            gr.update(visible=True),
+            gr.update(visible=True),
+            gr.update(visible=True),
             gr.update(visible=False, autoplay=False),
         )
 
@@ -98,16 +88,17 @@ with gr.Blocks() as demo:
 
     submit_button_1.click(
         handle_first_submission,
-        inputs=[text_input, stage],
-        outputs=[prob_text, stage],
+        inputs=[text_input],
+        outputs=[prob_text],
     ).then(
         display_audio,
-        inputs=[stage],
+        inputs=[],
         outputs=[dynamic_audio, submit_button_2, feedback, audio_output],
     )
 
     def audio_play():
-        return gr.update(visible=True, autoplay=True)
+        print("got it")
+        return gr.update(value="openai_output.wav", visible=True, autoplay=True)
 
     submit_button_2.click(
         handle_second_submission,
@@ -118,5 +109,7 @@ with gr.Blocks() as demo:
         inputs=[],
         outputs=[audio_output],
     )
+
+    print(audio_output)
 
 demo.launch(share=True)

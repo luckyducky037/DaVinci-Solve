@@ -6,3 +6,4 @@ SpeechRecognition
 leetscrape
 beautifulsoup4
 webbrowser
+openai

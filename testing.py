@@ -49,9 +49,6 @@ fetch = Fetch()
 
 question, title, question_body, question_code_stub = None, None, None, None
 
-redirect = False
-
-
 # Function to handle the first submission (problem submission)
 def handle_first_submission(option, stage):
     global question, title, question_body, question_code_stub
@@ -78,16 +75,16 @@ def handle_second_submission(audio, option):
     compare_result = api.compare_code(solution, codegen, question_body)
 
     if compare_result == "Yes":
-        feedback = "OK, that approach sounds good. Now, get ready to code it out."
-        redirect = True
+        title = title.replace(" ", "-").lower()
+        feedback = f"OK, that approach sounds good. Now, get ready to code it out. http://leetcode.com/problems/{title}/description/"
         # api.speak(feedback)
     else:
         feedback = api.evaluate_thinking(solution, codegen, question_body)
-        redirect = False
         # api.speak(feedback)
 
-    return feedback
+    print(transcript)
 
+    return feedback
 
 # Create the Gradio interface
 with gr.Blocks() as demo:
@@ -108,7 +105,7 @@ with gr.Blocks() as demo:
     )
 
     # Output text area for displaying results
-    output_text = gr.Textbox(label="Output Text")
+    prob_text = gr.Textbox(label="Problem Statement")
 
     # State to track the submission stage
     stage = gr.State(value=0)
@@ -126,28 +123,28 @@ with gr.Blocks() as demo:
     # Function to display the audio component dynamically based on the stage
     def display_audio(stage):
         if stage == 1:
-            return gr.update(visible=True), gr.update(visible=True)
-        return gr.update(visible=False), gr.update(visible=False)
+            return gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
+        return gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
     # Submit button for the first and second stages
     submit_button_2 = gr.Button("Submit Explanation", visible=False)
+
+    # Output text area for displaying results
+    feedback = gr.Textbox(label="Feedback", visible=False)
 
     # First click: handle problem submission, show audio input
     submit_button_1.click(
         handle_first_submission,
         inputs=[text_input, stage],
-        outputs=[output_text, stage],
-    ).then(display_audio, inputs=[stage], outputs=[dynamic_audio, submit_button_2])
+        outputs=[prob_text, stage],
+    ).then(display_audio, inputs=[stage], outputs=[dynamic_audio, submit_button_2, feedback])
 
     # Second click: handle audio submission (after it's visible)
     submit_button_2.click(
         handle_second_submission,
         inputs=[dynamic_audio, text_input],
-        outputs=[output_text],
+        outputs=[feedback],
     )
-
-    if redirect:
-        api.open_problem(title)
 
 
 # Launch the Gradio app

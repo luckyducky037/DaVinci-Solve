@@ -1,5 +1,7 @@
-import gradio as gr
 import os
+
+import gradio as gr
+
 from api import API
 from fetch import Fetch
 
@@ -84,7 +86,12 @@ with gr.Blocks() as demo:
     submit_button_2 = gr.Button("Submit Explanation", visible=False)
 
     feedback = gr.Textbox(label="Feedback", visible=False)
-    audio_output = gr.Audio(type="filepath", autoplay=False, visible=False)
+    audio_output = gr.Audio(
+        value=lambda: "openai_output.wav",
+        type="filepath",
+        autoplay=False,
+        visible=False,
+    )
 
     submit_button_1.click(
         handle_first_submission,
@@ -111,5 +118,7 @@ with gr.Blocks() as demo:
     )
 
     print(audio_output)
+
+demo.launch(share=True)
 
 demo.launch(share=True)

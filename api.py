@@ -30,7 +30,6 @@ def record_until_silence():
 
 def listen(filename) -> str:
     audio = record_until_silence()
-    print(audio)
 
     wav_data = audio.get_wav_data()
 
@@ -43,10 +42,26 @@ def listen(filename) -> str:
 
 
 def groq_listen(filename, prompt="") -> str:
-    filename += ".wav"
+    if not filename:
+        return
+    if filename[-4:] != ".wav":
+        filename += ".wav"
     with open(filename, "rb") as file:
         transcription = groq_client.audio.transcriptions.create(
             file=(filename, file.read()),
+            model="distil-whisper-large-v3-en",
+            prompt=prompt,
+            response_format="text",
+            language="en",
+            temperature=0.0,
+        )
+    return transcription
+
+
+def groq_listen2(filename: str, prompt="") -> str:
+    with open(filename, "rb") as recording:
+        transcription = groq_client.audio.transcriptions.create(
+            file=(filename, recording),
             model="distil-whisper-large-v3-en",
             prompt=prompt,
             response_format="text",
@@ -98,9 +113,12 @@ def orca_speak(text: str):
 class API:
     def __init__(self): ...
 
-    def listen(self) -> str:
-        listen("input")
-        transcription = groq_listen("input")
+    def listen(self, recording=None, gr: bool = False) -> str:
+        if not gr:
+            listen("input")
+            transcription = groq_listen("input")
+        else:
+            transcription = groq_listen(recording)
         refined = groq_response(
             prompts[3].format(transcription=transcription), stop=["\n"]
         )

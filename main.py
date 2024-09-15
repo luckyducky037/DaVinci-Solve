@@ -36,19 +36,22 @@ def handle_second_submission(audio, option):
         title = title.replace(" ", "-").lower()
         feedback = "OK, that approach sounds good. Now, get ready to code it out."
     else:
-        feedback = api.evaluate_thinking(solution, codegen, question_body)
+        feedback = api.evaluate_thinking(solution, codegen, transcript, question_body)
+        feedback = feedback.replace('^', " to the power of ")
 
     api.speak(feedback)
 
-    # * Speak the feedback "orca_output.wav"
+    # * Speak the feedback "openai_output.wav"
 
     if compare_result == "Yes":
         feedback += f" http://leetcode.com/problems/{title}/description/"
 
     print(transcript)
 
-    return feedback, "orca_output.wav"
+    return feedback, "openai_output.wav"
 
+def audioplay(audio):
+    ...
 
 with gr.Blocks() as demo:
     gr.Markdown("# Welcome to DaVinci Solve!")
@@ -78,19 +81,19 @@ with gr.Blocks() as demo:
                 gr.update(visible=True),
                 gr.update(visible=True),
                 gr.update(visible=True),
-                gr.update(visible=True),
+                gr.update(visible=True, autoplay=True),
             )
         return (
             gr.update(visible=False),
             gr.update(visible=False),
             gr.update(visible=False),
-            gr.update(visible=False),
+            gr.update(visible=False, autoplay=False),
         )
 
     submit_button_2 = gr.Button("Submit Explanation", visible=False)
 
     feedback = gr.Textbox(label="Feedback", visible=False)
-    audio_output = gr.Audio(type="filepath", autoplay=True, visible=False)
+    audio_output = gr.Audio(type="filepath", autoplay=False, visible=False)
 
     submit_button_1.click(
         handle_first_submission,
@@ -106,10 +109,6 @@ with gr.Blocks() as demo:
         handle_second_submission,
         inputs=[dynamic_audio, text_input],
         outputs=[feedback, audio_output],
-    ).then(
-        audio_output.play,
-        inputs=[],
-        outputs=[],
     )
 
 demo.launch(share=True)

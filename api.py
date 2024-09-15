@@ -1,21 +1,19 @@
 import webbrowser
 from os import getenv
 
-import pvorca
-
 # import pygame
 import speech_recognition as sr
 from dotenv import load_dotenv
 from groq import Groq
-
+from openai import OpenAI
+from pathlib import Path
 from prompts import prompts
 
 # pygame.mixer.init()
 load_dotenv()
 
 groq_client = Groq(api_key=getenv("GROQ"))
-orca_client = pvorca.create(access_key=getenv("ORCA"))
-
+openai_client = OpenAI(api_key=getenv("OPENAI"))
 
 def record_until_silence():
     r = sr.Recognizer()
@@ -94,14 +92,16 @@ def groq_response(
 
     return chat_completion.choices[0].message.content
 
+# convenience
+def openai_speak(text: str):
+    speech_file_path = Path(__file__).parent / "openai_output.wav"
+    response = openai_client.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input=text,
+    )
 
-def orca_speak(text: str):
-    orca_client.synthesize_to_file(text=text, output_path="orca_output.wav")
-    # pygame.mixer.music.load("orca_output.wav")
-    # pygame.mixer.music.play()
-    # while pygame.mixer.music.get_busy():
-    #     pass
-
+    response.stream_to_file(speech_file_path)
 
 """
 [0]: turn explanation into code
@@ -138,9 +138,9 @@ class API:
         )
         return response
 
-    def evaluate_thinking(self, code1: str, code2: str, leetcode: str) -> str:
+    def evaluate_thinking(self, code1: str, code2: str, text: str, leetcode: str) -> str:
         response = groq_response(
-            prompts[2].format(code1=code1, code2=code2, problem=leetcode),
+            prompts[2].format(code1=code1, code2=code2, pseudocode=text, problem=leetcode),
             temperature=0.0,
         )
         return response
@@ -154,7 +154,7 @@ class API:
         return response
 
     def speak(self, text: str) -> None:
-        orca_speak(text)
+        openai_speak(text)
 
     def open_problem(self, title: str):
         title = title.replace(" ", "-").lower()

@@ -2,14 +2,15 @@ import webbrowser
 from os import getenv
 
 import pvorca
-import pygame
+
+# import pygame
 import speech_recognition as sr
 from dotenv import load_dotenv
 from groq import Groq
 
 from prompts import prompts
 
-pygame.mixer.init()
+# pygame.mixer.init()
 load_dotenv()
 
 groq_client = Groq(api_key=getenv("GROQ"))
@@ -96,10 +97,10 @@ def groq_response(
 
 def orca_speak(text: str):
     orca_client.synthesize_to_file(text=text, output_path="orca_output.wav")
-    pygame.mixer.music.load("orca_output.wav")
-    pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy():
-        pass
+    # pygame.mixer.music.load("orca_output.wav")
+    # pygame.mixer.music.play()
+    # while pygame.mixer.music.get_busy():
+    #     pass
 
 
 """

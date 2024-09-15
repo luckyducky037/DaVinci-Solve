@@ -8,6 +8,7 @@ fetch = Fetch()
 
 question, title, question_body, question_code_stub = None, None, None, None
 
+
 def handle_first_submission(option, stage):
     global question, title, question_body, question_code_stub
 
@@ -22,6 +23,7 @@ def handle_first_submission(option, stage):
     stage = 1
     return transcript, stage
 
+
 def handle_second_submission(audio, option):
     global question, title, question_body, question_code_stub
 
@@ -32,13 +34,21 @@ def handle_second_submission(audio, option):
 
     if compare_result == "Yes":
         title = title.replace(" ", "-").lower()
-        feedback = f"OK, that approach sounds good. Now, get ready to code it out. http://leetcode.com/problems/{title}/description/"
+        feedback = "OK, that approach sounds good. Now, get ready to code it out."
     else:
         feedback = api.evaluate_thinking(solution, codegen, question_body)
 
+    api.speak(feedback)
+
+    # * Speak the feedback "orca_output.wav"
+
+    if compare_result == "Yes":
+        feedback += f" http://leetcode.com/problems/{title}/description/"
+
     print(transcript)
 
-    return feedback
+    return feedback, "orca_output.wav"
+
 
 with gr.Blocks() as demo:
     gr.Markdown("# Welcome to DaVinci Solve!")
@@ -64,23 +74,38 @@ with gr.Blocks() as demo:
 
     def display_audio(stage):
         if stage == 1:
-            return gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
-        return gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+            return (
+                gr.update(visible=True),
+                gr.update(visible=True),
+                gr.update(visible=True),
+                gr.update(visible=True),
+            )
+        return (
+            gr.update(visible=False),
+            gr.update(visible=False),
+            gr.update(visible=False),
+            gr.update(visible=False),
+        )
 
     submit_button_2 = gr.Button("Submit Explanation", visible=False)
 
     feedback = gr.Textbox(label="Feedback", visible=False)
+    audio_output = gr.Audio(type="filepath", autoplay=True, visible=False)
 
     submit_button_1.click(
         handle_first_submission,
         inputs=[text_input, stage],
         outputs=[prob_text, stage],
-    ).then(display_audio, inputs=[stage], outputs=[dynamic_audio, submit_button_2, feedback])
+    ).then(
+        display_audio,
+        inputs=[stage],
+        outputs=[dynamic_audio, submit_button_2, feedback, audio_output],
+    )
 
     submit_button_2.click(
         handle_second_submission,
         inputs=[dynamic_audio, text_input],
-        outputs=[feedback],
+        outputs=[feedback, audio_output],
     )
 
 demo.launch(share=True)

@@ -1,10 +1,8 @@
 from bs4 import BeautifulSoup
-from leetscrape import ExtractSolutions, GetQuestion, GetQuestionsList
+from leetscrape import GetQuestion
 
 
 class Fetch:
-    def __init__(self): ...
-
     def get_question(self, title):
         title = title.replace(" ", "-").lower()
         question = GetQuestion(titleSlug=title).scrape()
@@ -23,13 +21,3 @@ class Fetch:
         title = title.replace(" ", "-").lower()
         with open(f"solutions/{title}.py") as file:
             return file.read()
-
-
-fetch = Fetch()
-
-# print(fetch.get_solution("Two Sum"))
-
-
-# print("\n".join(fetch.get_question("Two Sum")[:2]))
-# print("-" * 64)
-# print("\n".join(fetch.get_question("Palindrome Number")[:2]))

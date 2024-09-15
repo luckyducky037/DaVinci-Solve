@@ -100,8 +100,6 @@ def openai_speak(text: str):
 
 
 class API:
-    def __init__(self): ...
-
     def listen(self, recording=None, gr: bool = False) -> str:
         if not gr:
             listen("input")

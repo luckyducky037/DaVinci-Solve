@@ -87,7 +87,7 @@ with gr.Blocks() as demo:
 
     feedback = gr.Textbox(label="Feedback", visible=False)
     audio_output = gr.Audio(
-        value=lambda: os.path.abspath("openai_output.wav"),
+        value=os.path.abspath("openai_output.wav"),
         type="filepath",
         autoplay=False,
         visible=False,
@@ -106,7 +106,7 @@ with gr.Blocks() as demo:
     def audio_play():
         print("got it")
         return gr.update(
-            value=lambda: os.path.abspath("openai_output.wav"),
+            value=os.path.abspath("openai_output.wav"),
             visible=True,
             autoplay=True,
         )

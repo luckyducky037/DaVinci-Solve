@@ -1,4 +1,5 @@
 import gradio as gr
+import os
 
 from api import API
 from fetch import Fetch
@@ -47,7 +48,7 @@ def handle_second_submission(audio, option):
 
     print(transcript)
 
-    return feedback, "orca_output.wav"
+    return feedback, os.path.abspath("orca_output.wav")
 
 
 with gr.Blocks() as demo:

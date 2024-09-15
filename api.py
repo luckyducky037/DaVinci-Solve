@@ -123,6 +123,7 @@ class API:
         refined = groq_response(
             prompts[3].format(transcription=transcription), stop=["\n"]
         )
+        refined = refined.replace('^', " to the power of ")
         return refined
 
     def thinking_to_code(self, text: str, boilerplate: str) -> str:

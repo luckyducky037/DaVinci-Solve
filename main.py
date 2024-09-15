@@ -21,38 +21,29 @@ def handle_first_submission(option):
     question_body = question[1]
     question_code_stub = question[2]
 
-    transcript = f"{title}\n{question_body}"
-    return transcript
+    return f"{title}\n{question_body}"
 
 
-def handle_second_submission(audio, option):
+def handle_second_submission(audio):
     global question, title, question_body, question_code_stub
 
     transcript = api.listen(audio, gr=True)
     codegen = api.thinking_to_code(transcript, question_code_stub)
     solution = fetch.get_solution(title)
-    compare_result = api.compare_code(solution, codegen, question_body)
+    compare_result = api.compare_code(solution, codegen, transcript, question_body)
 
     if compare_result == "Yes":
         title = title.replace(" ", "-").lower()
         feedback = "OK, that approach sounds good. Now, get ready to code it out."
     else:
         feedback = api.evaluate_thinking(solution, codegen, transcript, question_body)
-        feedback = feedback.replace("^", " to the power of ")
 
     api.speak(feedback)
-
-    # * Speak the feedback "openai_output.wav"
 
     if compare_result == "Yes":
         feedback += f" http://leetcode.com/problems/{title}/description/"
 
-    print(transcript)
-
-    return feedback, os.path.abspath("openai_output.wav")
-
-
-def audioplay(audio): ...
+    return transcript, feedback, os.path.abspath("openai_output.wav")
 
 
 with gr.Blocks() as demo:
@@ -80,11 +71,13 @@ with gr.Blocks() as demo:
             gr.update(visible=True),
             gr.update(visible=True),
             gr.update(visible=True),
+            gr.update(visible=True),
             gr.update(visible=False, autoplay=False),
         )
 
     submit_button_2 = gr.Button("Submit Explanation", visible=False)
 
+    transcript = gr.Textbox(label="Transcript", visible=False)
     feedback = gr.Textbox(label="Feedback", visible=False)
     audio_output = gr.Audio(
         value=os.path.abspath("openai_output.wav"),
@@ -100,11 +93,10 @@ with gr.Blocks() as demo:
     ).then(
         display_audio,
         inputs=[],
-        outputs=[dynamic_audio, submit_button_2, feedback, audio_output],
+        outputs=[dynamic_audio, submit_button_2, transcript, feedback, audio_output],
     )
 
     def audio_play():
-        print("got it")
         return gr.update(
             value=os.path.abspath("openai_output.wav"),
             visible=True,
@@ -113,14 +105,13 @@ with gr.Blocks() as demo:
 
     submit_button_2.click(
         handle_second_submission,
-        inputs=[dynamic_audio, text_input],
-        outputs=[feedback, audio_output],
+        inputs=[dynamic_audio],
+        outputs=[transcript, feedback, audio_output],
     ).then(
         audio_play,
         inputs=[],
         outputs=[audio_output],
     )
 
-    print(audio_output)
 
 demo.launch(share=True)

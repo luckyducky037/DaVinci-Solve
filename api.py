@@ -1,19 +1,19 @@
 import webbrowser
 from os import getenv
+from pathlib import Path
 
-# import pygame
 import speech_recognition as sr
 from dotenv import load_dotenv
 from groq import Groq
 from openai import OpenAI
-from pathlib import Path
+
 from prompts import prompts
 
-# pygame.mixer.init()
 load_dotenv()
 
 groq_client = Groq(api_key=getenv("GROQ"))
 openai_client = OpenAI(api_key=getenv("OPENAI"))
+
 
 def record_until_silence():
     r = sr.Recognizer()
@@ -57,19 +57,6 @@ def groq_listen(filename, prompt="") -> str:
     return transcription
 
 
-def groq_listen2(filename: str, prompt="") -> str:
-    with open(filename, "rb") as recording:
-        transcription = groq_client.audio.transcriptions.create(
-            file=(filename, recording),
-            model="distil-whisper-large-v3-en",
-            prompt=prompt,
-            response_format="text",
-            language="en",
-            temperature=0.0,
-        )
-    return transcription
-
-
 def groq_response(
     prompt,
     temperature: float = 1.0,
@@ -92,7 +79,7 @@ def groq_response(
 
     return chat_completion.choices[0].message.content
 
-# convenience
+
 def openai_speak(text: str):
     speech_file_path = Path(__file__).parent / "openai_output.wav"
     response = openai_client.audio.speech.create(
@@ -101,7 +88,8 @@ def openai_speak(text: str):
         input=text,
     )
 
-    response.stream_to_file(speech_file_path)
+    response.stream_to_file(speech_file_path)  # TODO: update once fully deprecated
+
 
 """
 [0]: turn explanation into code
@@ -123,7 +111,7 @@ class API:
         refined = groq_response(
             prompts[3].format(transcription=transcription), stop=["\n"]
         )
-        refined = refined.replace('^', " to the power of ")
+        refined = refined.strip('"')
         return refined
 
     def thinking_to_code(self, text: str, boilerplate: str) -> str:
@@ -138,16 +126,22 @@ class API:
         )
         return response
 
-    def evaluate_thinking(self, code1: str, code2: str, text: str, leetcode: str) -> str:
+    def evaluate_thinking(
+        self, code1: str, code2: str, text: str, leetcode: str
+    ) -> str:
         response = groq_response(
-            prompts[2].format(code1=code1, code2=code2, pseudocode=text, problem=leetcode),
+            prompts[2].format(
+                code1=code1, code2=code2, pseudocode=text, problem=leetcode
+            ),
             temperature=0.0,
         )
         return response
 
-    def compare_code(self, code1: str, code2: str, leetcode: str) -> str:
+    def compare_code(self, code1: str, code2: str, text: str, leetcode: str) -> str:
         response = groq_response(
-            prompts[1].format(code1=code1, code2=code2, problem=leetcode),
+            prompts[1].format(
+                code1=code1, code2=code2, pseudocode=text, problem=leetcode
+            ),
             temperature=0.0,
             max_tokens=1,
         )
@@ -159,6 +153,3 @@ class API:
     def open_problem(self, title: str):
         title = title.replace(" ", "-").lower()
         webbrowser.open(f"http://leetcode.com/problems/{title}/description/")
-
-
-api = API()

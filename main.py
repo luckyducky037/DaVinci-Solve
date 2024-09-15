@@ -87,7 +87,7 @@ with gr.Blocks() as demo:
 
     feedback = gr.Textbox(label="Feedback", visible=False)
     audio_output = gr.Audio(
-        value=lambda: "openai_output.wav",
+        value=lambda: os.path.abspath("openai_output.wav"),
         type="filepath",
         autoplay=False,
         visible=False,
@@ -105,7 +105,11 @@ with gr.Blocks() as demo:
 
     def audio_play():
         print("got it")
-        return gr.update(value="openai_output.wav", visible=True, autoplay=True)
+        return gr.update(
+            value=lambda: os.path.abspath("openai_output.wav"),
+            visible=True,
+            autoplay=True,
+        )
 
     submit_button_2.click(
         handle_second_submission,
@@ -118,7 +122,5 @@ with gr.Blocks() as demo:
     )
 
     print(audio_output)
-
-demo.launch(share=True)
 
 demo.launch(share=True)

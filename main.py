@@ -37,7 +37,7 @@ def handle_second_submission(audio, option):
         feedback = "OK, that approach sounds good. Now, get ready to code it out."
     else:
         feedback = api.evaluate_thinking(solution, codegen, transcript, question_body)
-        feedback = feedback.replace('^', " to the power of ")
+        feedback = feedback.replace("^", " to the power of ")
 
     api.speak(feedback)
 
@@ -50,8 +50,9 @@ def handle_second_submission(audio, option):
 
     return feedback, "openai_output.wav"
 
-def audioplay(audio):
-    ...
+
+def audioplay(audio): ...
+
 
 with gr.Blocks() as demo:
     gr.Markdown("# Welcome to DaVinci Solve!")
@@ -81,7 +82,7 @@ with gr.Blocks() as demo:
                 gr.update(visible=True),
                 gr.update(visible=True),
                 gr.update(visible=True),
-                gr.update(visible=True, autoplay=True),
+                gr.update(visible=False, autoplay=False),
             )
         return (
             gr.update(visible=False),
@@ -105,10 +106,17 @@ with gr.Blocks() as demo:
         outputs=[dynamic_audio, submit_button_2, feedback, audio_output],
     )
 
+    def audio_play():
+        return gr.update(visible=True, autoplay=True)
+
     submit_button_2.click(
         handle_second_submission,
         inputs=[dynamic_audio, text_input],
         outputs=[feedback, audio_output],
+    ).then(
+        audio_play,
+        inputs=[],
+        outputs=[audio_output],
     )
 
 demo.launch(share=True)

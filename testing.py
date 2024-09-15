@@ -40,17 +40,22 @@ from fetch import Fetch
 api = API()
 fetch = Fetch()
 
-question, title, question_body, question_code_stub = (
-    gr.State(None),
-    gr.State(None),
-    gr.State(None),
-    gr.State(None),
-)
+# question, title, question_body, question_code_stub = (
+#     gr.State(None),
+#     gr.State(None),
+#     gr.State(None),
+#     gr.State(None),
+# )
+
+question, title, question_body, question_code_stub = None, None, None, None
+
 redirect = False
 
 
 # Function to handle the first submission (problem submission)
 def handle_first_submission(option, stage):
+    global question, title, question_body, question_code_stub
+
     question_title = option.replace(" ", "-").lower()
     question = fetch.get_question(question_title)
 
@@ -65,6 +70,8 @@ def handle_first_submission(option, stage):
 
 # Function to handle the second submission (audio recording submission)
 def handle_second_submission(audio, option):
+    global question, title, question_body, question_code_stub
+
     transcript = api.listen(audio, gr=True)
     codegen = api.thinking_to_code(transcript, question_code_stub)
     solution = fetch.get_solution(title)
@@ -84,6 +91,13 @@ def handle_second_submission(audio, option):
 
 # Create the Gradio interface
 with gr.Blocks() as demo:
+    # question, title, question_body, question_code_stub = (
+    #     gr.State(None),
+    #     gr.State(None),
+    #     gr.State(None),
+    #     gr.State(None),
+    # )
+
     gr.Markdown("# Welcome to DaVinci Solve!")
 
     # Textbox for Leetcode problem input
